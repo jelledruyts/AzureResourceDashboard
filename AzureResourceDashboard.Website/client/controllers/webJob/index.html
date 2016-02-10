@@ -1,0 +1,34 @@
+﻿<h3>WebJobs</h3>
+<div ng-hide="!errorMessage" class="alert alert-danger">{{errorMessage}}</div>
+<div ng-show="isLoading" class="alert alert-info"><span class="fa fa-refresh fa-spin"></span> {{loadingMessage}}</div>
+<div ng-hide="isLoading">
+    <button ng-click="populate()" class="btn btn-info"><span class="fa fa-refresh"></span> Refresh</button>
+</div>
+<div ng-show="webJobs.length > 0" ng-init="populate()" class="offset-top-md">
+    <table class="table table-bordered table-hover table-responsive table-striped">
+        <thead>
+            <tr>
+                <th>Subscription</th>
+                <th>Resource Group</th>
+                <th>Web App</th>
+                <th>Location</th>
+                <th>WebJob</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Time (Local)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="webJobInfo in webJobInfos">
+                <td><span title="Subscription ID: {{webJobInfo.subscription.id}}">{{webJobInfo.subscription.displayName}}</span></td>
+                <td>{{webJobInfo.webApp.resourceGroupName}}</td>
+                <td><a href="{{webJobInfo.webApp.scmUrl}}">{{webJobInfo.webApp.name}}</a></td>
+                <td>{{webJobInfo.webApp.location}}</td>
+                <td><a href="{{webJobInfo.webJob.detailsUrl}}">{{webJobInfo.webJob.name}}</a></td>
+                <td>{{WebJobType[webJobInfo.webJob.type]}}</td>
+                <td><span class="label {{webJobInfo.webJob.statusLevel | bootstrap:'StatusLevel'}}">{{webJobInfo.webJob.statusDescription}}</span></td>
+                <td>{{webJobInfo.webJob.statusTime | datetime}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

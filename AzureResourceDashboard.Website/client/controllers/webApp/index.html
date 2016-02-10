@@ -1,0 +1,32 @@
+﻿<h3>Web Apps</h3>
+<div ng-hide="!errorMessage" class="alert alert-danger">{{errorMessage}}</div>
+<div ng-show="isLoading" class="alert alert-info"><span class="fa fa-refresh fa-spin"></span> {{loadingMessage}}</div>
+<div ng-hide="isLoading">
+    <button ng-click="populate()" class="btn btn-info"><span class="fa fa-refresh"></span> Refresh</button>
+</div>
+<div ng-show="webAppInfos.length > 0" ng-init="populate()" class="offset-top-md">
+    <table class="table table-bordered table-hover table-responsive table-striped">
+        <thead>
+            <tr>
+                <th>Subscription</th>
+                <th>Resource Group</th>
+                <th>Web App</th>
+                <th>Location</th>
+                <th>Enabled</th>
+                <th>State</th>
+                <th>Time (Local)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="webAppInfo in webAppInfos">
+                <td><span title="Subscription ID: {{webAppInfo.subscription.id}}">{{webAppInfo.subscription.displayName}}</span></td>
+                <td>{{webAppInfo.webApp.resourceGroupName}}</td>
+                <td><a href="{{webAppInfo.webApp.scmUrl}}">{{webAppInfo.webApp.name}}</a></td>
+                <td>{{webAppInfo.webApp.location}}</td>
+                <td><span class="label {{webAppInfo.webApp.enabled | bootstrap:'boolean'}}">{{webAppInfo.webApp.enabled ? "yes" : "no"}}</span></td>
+                <td><span class="label {{webAppInfo.webApp.state | bootstrap:'WebAppState'}}">{{WebAppState[webAppInfo.webApp.state]}}</span></td>
+                <td>{{webAppInfo.webApp.statusTime | datetime}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
