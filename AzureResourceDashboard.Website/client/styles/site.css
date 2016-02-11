@@ -24,27 +24,27 @@ textarea {
 }
 
 .offset-top-md {
-    margin-top: 10px;
+    margin-top: 10px !important;
 }
 
 .offset-top-lg {
-    margin-top: 20px;
+    margin-top: 20px !important;
 }
 
 .offset-top-xl {
-    margin-top: 40px;
+    margin-top: 40px !important;
 }
 
 .offset-bottom-md {
-    margin-bottom: 10px;
+    margin-bottom: 10px !important;
 }
 
 .offset-bottom-lg {
-    margin-bottom: 20px;
+    margin-bottom: 20px !important;
 }
 
 .offset-bottom-xl {
-    margin-bottom: 40px;
+    margin-bottom: 40px !important;
 }
 
 footer {
@@ -53,4 +53,27 @@ footer {
     padding-top: 10px;
     padding-bottom: 40px;
     font-size: smaller;
+}
+
+.panel-heading-danger {
+    color: #fff !important;
+    background-color: #c9302c !important;
+    border-color: #ac2925 !important;
+}
+
+.panel-heading-warning {
+    color: #fff !important;
+    background-color: #ec971f !important;
+    border-color: #d58512 !important;
+}
+
+.panel-heading-info {
+    color: #fff !important;
+    background-color: #31b0d5 !important;
+    border-color: #269abc !important;
+}
+.panel-heading-success {
+    color: #fff !important;
+    background-color: #449d44 !important;
+    border-color: #398439 !important;
 }

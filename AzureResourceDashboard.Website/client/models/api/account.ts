@@ -1,4 +1,4 @@
-﻿module app.models {
+﻿module app.models.api {
     "use strict";
 
     export interface IAccount {

@@ -12,9 +12,10 @@ namespace AzureResourceDashboard.Website.Models
         public bool Enabled { get; }
         public string ScmUrl { get; }
         public string ResourceGroupName { get; }
+        public StatusLevel StatusLevel { get; }
         public DateTimeOffset StatusTime { get; }
 
-        public WebApp(string subscriptionId, string id, string name, string location, WebAppState state, bool enabled, string scmUrl, string resourceGroupName, DateTimeOffset statusTime)
+        public WebApp(string subscriptionId, string id, string name, string location, WebAppState state, bool enabled, string scmUrl, string resourceGroupName, StatusLevel statusLevel, DateTimeOffset statusTime)
         {
             this.SubscriptionId = subscriptionId;
             this.Id = id;
@@ -24,6 +25,7 @@ namespace AzureResourceDashboard.Website.Models
             this.Enabled = enabled;
             this.ScmUrl = scmUrl;
             this.ResourceGroupName = resourceGroupName;
+            this.StatusLevel = statusLevel;
             this.StatusTime = statusTime;
         }
     }

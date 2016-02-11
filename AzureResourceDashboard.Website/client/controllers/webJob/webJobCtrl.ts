@@ -6,10 +6,9 @@
         isLoading: boolean;
         loadingMessage: string;
         populate: () => void;
-        webJobInfos: IWebJobInfo[];
-        subscriptions: app.models.ISubscription[];
-        webApps: app.models.IWebApp[];
-        webJobs: app.models.IWebJob[];
+        subscriptions: app.models.client.ISubscriptionInfo[];
+        webJobs: app.models.client.IWebJobInfo[];
+        viewType: app.models.client.ViewType;
     }
 
     class WebJobCtrl extends BaseCtrl {
@@ -17,33 +16,45 @@
         public static $inject = ["$scope", "$q", "localApiSvc"];
         public constructor(private $scope: IWebJobScope, private $q: ng.IQService, localApiSvc: app.services.LocalApiSvc) {
             super($scope, false);
+
+            $scope.viewType = app.models.client.ViewType.Table;
+
             $scope.populate = function () {
                 $scope.isLoading = true;
 
                 $scope.loadingMessage = "Loading Subscriptions...";
-                $scope.webApps = [];
                 $scope.webJobs = [];
-                $scope.webJobInfos = [];
                 localApiSvc.getSubscriptions()
                     .then(function (response) {
-                        $scope.subscriptions = response.data;
+                        $scope.subscriptions = response.data.map(subscription => {
+                            return { subscription: subscription, highestStatusLevel: app.models.api.StatusLevel.None, webApps: [] };
+                        });
 
                         $scope.loadingMessage = "Loading Web Apps...";
                         var subscriptionPromises = $scope.subscriptions.map(subscription => {
-                            return localApiSvc.getWebApps(subscription.id)
+                            return localApiSvc.getWebApps(subscription.subscription.id)
                                 .then(function (response) {
                                     var subscriptionWebApps = response.data;
-                                    $scope.webApps = $scope.webApps.concat(subscriptionWebApps);
 
                                     var webAppPromises = subscriptionWebApps.map(webApp => {
+                                        var webAppInfo = { subscription: subscription, webJobs: <app.models.client.IWebJobInfo[]>[], webApp: webApp, highestStatusLevel: app.models.api.StatusLevel.None }
+                                        subscription.webApps.push(webAppInfo);
+
                                         $scope.loadingMessage = "Loading WebJobs...";
                                         return localApiSvc.getWebJobs(webApp.id, webApp.scmUrl)
                                             .then(function (response) {
                                                 var webAppWebJobs = response.data;
-                                                $scope.webJobs = $scope.webJobs.concat(webAppWebJobs);
 
                                                 webAppWebJobs.forEach(webJob => {
-                                                    $scope.webJobInfos.push({ subscription: subscription, webApp: webApp, webJob: webJob });
+                                                    var webJobInfo = { subscription: subscription, webApp: webAppInfo, webJob: webJob };
+                                                    webAppInfo.webJobs.push(webJobInfo);
+                                                    if (subscription.highestStatusLevel < webJob.statusLevel) {
+                                                        subscription.highestStatusLevel = webJob.statusLevel;
+                                                    }
+                                                    if (webAppInfo.highestStatusLevel < webJob.statusLevel) {
+                                                        webAppInfo.highestStatusLevel = webJob.statusLevel;
+                                                    }
+                                                    $scope.webJobs.push(webJobInfo);
                                                 });
                                             });
                                     });

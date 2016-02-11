@@ -1,4 +1,4 @@
-﻿module app.models {
+﻿module app.models.api {
     "use strict";
 
     export interface IWebApp {
@@ -10,6 +10,7 @@
         enabled: boolean;
         scmUrl: string;
         resourceGroupName: string;
+        statusLevel: StatusLevel;
         statusTime: string;
     }
 }

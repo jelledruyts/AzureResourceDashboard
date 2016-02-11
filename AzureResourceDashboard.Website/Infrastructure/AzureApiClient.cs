@@ -108,7 +108,8 @@ namespace AzureResourceDashboard.Website.Infrastructure
                         scmUrl = "https://{0}/".FormatInvariant(scmDnsName);
                     }
 
-                    webAppList.Add(new WebApp(subscriptionId, id, name, location, state, enabled, scmUrl, resourceGroupName, DateTimeOffset.UtcNow));
+                    var statusLevel = enabled && state == WebAppState.Running ? StatusLevel.Success : StatusLevel.Error;
+                    webAppList.Add(new WebApp(subscriptionId, id, name, location, state, enabled, scmUrl, resourceGroupName, statusLevel, DateTimeOffset.UtcNow));
                 }
                 webAppsData = await CallNextLinkAsync(webApps);
             }
@@ -142,7 +143,7 @@ namespace AzureResourceDashboard.Website.Infrastructure
                     if (latestRun == null || latestRun.Type == JTokenType.Null)
                     {
                         statusDescription = "Never Ran";
-                        statusLevel = StatusLevel.Inactive;
+                        statusLevel = StatusLevel.Info;
                     }
                     else
                     {
@@ -216,12 +217,9 @@ namespace AzureResourceDashboard.Website.Infrastructure
         {
             switch (statusText.ToLowerInvariant())
             {
-                // Normal
+                // Success
                 case "running":
                 case "queued":
-                    return StatusLevel.Active;
-
-                // Success
                 case "success":
                 case "completedsuccess":
                     return StatusLevel.Success;

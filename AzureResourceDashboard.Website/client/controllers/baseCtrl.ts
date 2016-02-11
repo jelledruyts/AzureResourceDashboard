@@ -2,7 +2,7 @@
     "use strict";
 
     export interface IBaseScope extends ng.IScope {
-        accountInfo: app.models.IAccount;
+        accountInfo: app.models.api.IAccount;
     }
 
     export class BaseCtrl {
@@ -14,6 +14,9 @@
                     }
                 });
             }
+            angular.element(document).ready(function () {
+                $(".collapse").collapse();
+            });
         }
     }
 }

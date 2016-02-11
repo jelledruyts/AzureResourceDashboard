@@ -14,7 +14,6 @@ namespace AzureResourceDashboard.Website
         public const string AuthenticationPropertiesKeyTenant = "Tenant";
 
         public void ConfigureAuth(IAppBuilder app)
-
         {
             app.SetDefaultSignInAsAuthenticationType(CookieAuthenticationDefaults.AuthenticationType);
 
@@ -42,6 +41,8 @@ namespace AzureResourceDashboard.Website
                                 context.ProtocolMessage.IssuerAddress = context.ProtocolMessage.IssuerAddress.Replace(AuthenticationHelper.CommonAuthority, AuthenticationHelper.AadInstance + tenant);
                                 context.ProtocolMessage.DomainHint = tenant;
                             }
+                            var urlHelper = new UrlHelper(HttpContext.Current.Request.RequestContext);
+                            context.ProtocolMessage.RedirectUri = urlHelper.AbsoluteAppRootUrl();
                             return Task.FromResult(0);
                         },
                         AuthenticationFailed = (context) =>

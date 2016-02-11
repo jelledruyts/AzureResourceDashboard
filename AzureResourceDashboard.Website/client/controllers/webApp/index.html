@@ -1,32 +1,131 @@
 ﻿<h3>Web Apps</h3>
 <div ng-hide="!errorMessage" class="alert alert-danger">{{errorMessage}}</div>
 <div ng-show="isLoading" class="alert alert-info"><span class="fa fa-refresh fa-spin"></span> {{loadingMessage}}</div>
-<div ng-hide="isLoading">
+<div ng-hide="isLoading" ng-init="populate()">
     <button ng-click="populate()" class="btn btn-info"><span class="fa fa-refresh"></span> Refresh</button>
-</div>
-<div ng-show="webAppInfos.length > 0" ng-init="populate()" class="offset-top-md">
-    <table class="table table-bordered table-hover table-responsive table-striped">
-        <thead>
-            <tr>
-                <th>Subscription</th>
-                <th>Resource Group</th>
-                <th>Web App</th>
-                <th>Location</th>
-                <th>Enabled</th>
-                <th>State</th>
-                <th>Time (Local)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="webAppInfo in webAppInfos">
-                <td><span title="Subscription ID: {{webAppInfo.subscription.id}}">{{webAppInfo.subscription.displayName}}</span></td>
-                <td>{{webAppInfo.webApp.resourceGroupName}}</td>
-                <td><a href="{{webAppInfo.webApp.scmUrl}}">{{webAppInfo.webApp.name}}</a></td>
-                <td>{{webAppInfo.webApp.location}}</td>
-                <td><span class="label {{webAppInfo.webApp.enabled | bootstrap:'boolean'}}">{{webAppInfo.webApp.enabled ? "yes" : "no"}}</span></td>
-                <td><span class="label {{webAppInfo.webApp.state | bootstrap:'WebAppState'}}">{{WebAppState[webAppInfo.webApp.state]}}</span></td>
-                <td>{{webAppInfo.webApp.statusTime | datetime}}</td>
-            </tr>
-        </tbody>
-    </table>
+
+    <div ng-hide="webApps.length > 0" class="offset-top-md">
+        <div class="alert alert-info">We couldn't find anything.</div>
+    </div>
+
+    <div ng-show="webApps.length > 0" class="offset-top-md">
+
+        <ul class="nav nav-tabs">
+            <li role="presentation" ng-class="viewType === ViewType.Table ? 'active' : ''"><a ng-click="viewType = ViewType.Table">Table</a></li>
+            <li role="presentation" ng-class="viewType === ViewType.Tree ? 'active' : ''"><a ng-click="viewType = ViewType.Tree">Hierarchy</a></li>
+            <li role="presentation" ng-class="viewType === ViewType.Tiles ? 'active' : ''"><a ng-click="viewType = ViewType.Tiles">Tiles</a></li>
+        </ul>
+
+        <div ng-show="viewType === ViewType.Table">
+            <table class="table table-bordered table-hover table-responsive table-striped">
+                <thead>
+                    <tr>
+                        <th>Subscription</th>
+                        <th>Web App</th>
+                        <th>Resource Group</th>
+                        <th>Location</th>
+                        <th>Enabled</th>
+                        <th>State</th>
+                        <th>Time (Local)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="webAppInfo in webApps">
+                        <td><span title="Subscription ID: {{webAppInfo.subscription.subscription.id}}">{{webAppInfo.subscription.subscription.displayName}}</span></td>
+                        <td><a href="{{webAppInfo.webApp.scmUrl}}">{{webAppInfo.webApp.name}}</a></td>
+                        <td>{{webAppInfo.webApp.resourceGroupName}}</td>
+                        <td>{{webAppInfo.webApp.location}}</td>
+                        <td><span class="label label-{{webAppInfo.webApp.enabled | bootstrap:'boolean'}}">{{webAppInfo.webApp.enabled ? "yes" : "no"}}</span></td>
+                        <td><span class="label label-{{webAppInfo.webApp.state | bootstrap:'WebAppState'}}">{{WebAppState[webAppInfo.webApp.state]}}</span></td>
+                        <td>{{webAppInfo.webApp.statusTime | datetime}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-show="viewType === ViewType.Tree">
+            <div class="panel-group" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default offset-top-lg" ng-repeat="subscriptionInfo in subscriptions">
+                    <div class="panel-heading panel-heading-{{subscriptionInfo.highestStatusLevel | bootstrap:'StatusLevel'}}" role="tab" id="subscription-heading-{{subscriptionInfo.subscription.id}}">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-target="#subscription-body-{{subscriptionInfo.subscription.id}}" aria-expanded="true" aria-controls="subscription-body-{{subscriptionInfo.subscription.id}}">
+                                <span title="{{subscriptionInfo.subscription.id}}">{{subscriptionInfo.subscription.displayName}}</span>
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="subscription-body-{{subscriptionInfo.subscription.id}}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="subscription-heading-{{subscriptionInfo.subscription.id}}">
+                        <div class="panel-body">
+
+                            <div class="panel-group" role="tablist" aria-multiselectable="true">
+                                <div class="panel panel-default offset-top-lg" ng-repeat="webAppInfo in subscriptionInfo.webApps">
+                                    <div class="panel-heading panel-heading-{{webAppInfo.webApp.statusLevel | bootstrap:'StatusLevel'}}" role="tab" id="webapp-heading-{{subscriptionInfo.subscription.id}}-{{webAppInfo.webApp.name}}">
+                                        <h4 class="panel-title">
+                                            <a role="button" data-toggle="collapse" data-target="#webapp-body-{{subscriptionInfo.subscription.id}}-{{webAppInfo.webApp.name}}" aria-expanded="true" aria-controls="webapp-body-{{subscriptionInfo.subscription.id}}-{{webAppInfo.webApp.name}}">
+                                                {{webAppInfo.webApp.name}}
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="webapp-body-{{subscriptionInfo.subscription.id}}-{{webAppInfo.webApp.name}}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="webapp-heading-{{subscriptionInfo.subscription.id}}-{{webAppInfo.webApp.name}}">
+                                        <div class="panel-body">
+
+                                            <dl class="dl-horizontal">
+                                                <dt>Resource Group</dt>
+                                                <dd>{{webAppInfo.webApp.resourceGroupName}}</dd>
+                                                <dt>Location</dt>
+                                                <dd>{{webAppInfo.webApp.location}}</dd>
+                                                <dt>Enabled</dt>
+                                                <dd><span class="label label-{{webAppInfo.webApp.enabled | bootstrap:'boolean'}}">{{webAppInfo.webApp.enabled ? "yes" : "no"}}</span></dd>
+                                                <dt>State</dt>
+                                                <dd><span class="label label-{{webAppInfo.webApp.state | bootstrap:'WebAppState'}}">{{WebAppState[webAppInfo.webApp.state]}}</span></dd>
+                                                <dt>Time (Local)</dt>
+                                                <dd>{{webAppInfo.webApp.statusTime | datetime}}</dd>
+                                            </dl>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div ng-show="viewType === ViewType.Tiles">
+            <div class="panel-group" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default offset-top-lg" ng-repeat="webAppInfo in webApps">
+                    <div class="panel-heading panel-heading-{{webAppInfo.webApp.statusLevel | bootstrap:'StatusLevel'}}" role="tab" id="webapp-heading-{{webAppInfo.subscription.subscription.id}}-{{webAppInfo.webApp.name}}">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-target="#webapp-body-{{webAppInfo.subscription.subscription.id}}-{{webAppInfo.webApp.name}}" aria-expanded="true" aria-controls="webapp-body-{{webAppInfo.subscription.subscription.id}}-{{webAppInfo.webApp.name}}">
+                                {{webAppInfo.webApp.name}}
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="webapp-body-{{webAppInfo.subscription.subscription.id}}-{{webAppInfo.webApp.name}}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="webapp-heading-{{webAppInfo.subscription.subscription.id}}-{{webAppInfo.webApp.name}}">
+                        <div class="panel-body">
+
+                            <dl class="dl-horizontal">
+                                <dt>Subscription</dt>
+                                <dd><span title="Subscription ID: {{webAppInfo.subscription.subscription.id}}">{{webAppInfo.subscription.subscription.displayName}}</span></dd>
+                                <dt>Web App</dt>
+                                <dd><a href="{{webAppInfo.webApp.scmUrl}}">{{webAppInfo.webApp.name}}</a></dd>
+                                <dt>Resource Group</dt>
+                                <dd>{{webAppInfo.webApp.resourceGroupName}}</dd>
+                                <dt>Location</dt>
+                                <dd>{{webAppInfo.webApp.location}}</dd>
+                                <dt>Enabled</dt>
+                                <dd><span class="label label-{{webAppInfo.webApp.enabled | bootstrap:'boolean'}}">{{webAppInfo.webApp.enabled ? "yes" : "no"}}</span></dd>
+                                <dt>State</dt>
+                                <dd><span class="label label-{{webAppInfo.webApp.state | bootstrap:'WebAppState'}}">{{WebAppState[webAppInfo.webApp.state]}}</span></dd>
+                                <dt>Time (Local)</dt>
+                                <dd>{{webAppInfo.webApp.statusTime | datetime}}</dd>
+                            </dl>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

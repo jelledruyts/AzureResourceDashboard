@@ -5,8 +5,8 @@
         isActiveLocation: (viewLocation: string) => boolean;
         isLoadingAccountInfo: boolean;
         errorMessage: string;
-        tenants: app.models.ITenant[];
-        selectedTenant: app.models.ITenant;
+        tenants: app.models.api.ITenant[];
+        selectedTenant: app.models.api.ITenant;
         selectTenant: () => void;
     }
 

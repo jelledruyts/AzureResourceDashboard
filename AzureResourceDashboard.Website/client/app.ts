@@ -6,26 +6,24 @@
         .filter("bootstrap", ["$filter", function ($filter: ng.IFilterService) {
             return function (input: any, format: string) {
                 if (format === "StatusLevel") {
-                    switch (<app.models.StatusLevel>input) {
-                        case app.models.StatusLevel.Info: return "label-info";
-                        case app.models.StatusLevel.Success: return "label-success";
-                        case app.models.StatusLevel.Warning: return "label-warning";
-                        case app.models.StatusLevel.Error: return "label-danger";
-                        case app.models.StatusLevel.Active: return "label-info";
-                        case app.models.StatusLevel.Inactive: return "label-default";
-                        default: return "label-default";
+                    switch (<app.models.api.StatusLevel>input) {
+                        case app.models.api.StatusLevel.Info: return "info";
+                        case app.models.api.StatusLevel.Success: return "success";
+                        case app.models.api.StatusLevel.Warning: return "warning";
+                        case app.models.api.StatusLevel.Error: return "danger";
+                        default: return "default";
                     }
                 } else if (format === "WebAppState") {
-                    switch (<app.models.WebAppState>input) {
-                        case app.models.WebAppState.Running: return "label-success";
-                        case app.models.WebAppState.Stopped: return "label-danger";
-                        default: return "label-default";
+                    switch (<app.models.api.WebAppState>input) {
+                        case app.models.api.WebAppState.Running: return "success";
+                        case app.models.api.WebAppState.Stopped: return "danger";
+                        default: return "default";
                     }
                 } else if (format === "boolean") {
                     switch (<boolean>input) {
-                        case true: return "label-success";
-                        case false: return "label-danger";
-                        default: return "label-default";
+                        case true: return "success";
+                        case false: return "danger";
+                        default: return "default";
                     }
                 } else {
                     return input;
@@ -66,8 +64,9 @@
         // Initialization
         .run(["$rootScope", function ($rootScope: any) {
             // Make enums available on the root scope and therefore any child scope.
-            $rootScope.StatusLevel = app.models.StatusLevel;
-            $rootScope.WebAppState = app.models.WebAppState;
-            $rootScope.WebJobType = app.models.WebJobType;
+            $rootScope.StatusLevel = app.models.api.StatusLevel;
+            $rootScope.WebAppState = app.models.api.WebAppState;
+            $rootScope.WebJobType = app.models.api.WebJobType;
+            $rootScope.ViewType = app.models.client.ViewType;
         }]);
 }
